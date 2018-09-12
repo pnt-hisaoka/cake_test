@@ -1,2 +1,3 @@
 # cake_test
-cakephp3のテスト
+cakephp3のテストです。
+
