@@ -33,21 +33,4 @@ jobs:
           name: Initialize Database
           command: bin/cake migrations migrate
       - run: vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit.xml
-  php_code_sniffer:
-    docker:
-      - image: tenkoma/php:7.1-apache-sample
-        environment:
-          DEBUG: true
-    working_directory: /var/www/html
-    steps:
-      - restore_cache:
-          key: cakephp3-circleci-example-{{ .Branch }}
-      - checkout
-      - run: composer install --dev --no-interaction
-      - save_cache:
-          key: cakephp3-circleci-example-{{ .Branch }}
-          paths:
-            - "/home/ubuntu/.composer/cache"
-      - run:
-          name: php code sniffer
-          command: vendor/bin/phpcs --colors -p --encoding=utf-8 --extensions=php --standard=phpcs.xml.dist ./src ./tests
+
