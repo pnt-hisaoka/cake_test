@@ -6,17 +6,9 @@ version: 2
 jobs:
   build:
     docker:
-     - image: tenkoma/php:7.2-apache-sample
-          environment:
-            DEBUG: true
-            DATABASE_URL: "mysql://root@127.0.0.1/cake_test_db1?encoding=utf8mb4&timezone=UTC&cacheMetadata=true"
-            DATABASE_TEST_URL: "mysql://root@127.0.0.1/cake_test_db1?encoding=utf8mb4&timezone=UTC&    cacheMetadata=true"
-        - image: circleci/mysql:8.0
-          command: mysqld  --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
-          environment:
-            MYSQL_DATABASE: cisample
-            MYSQL_ROOT_PASSWORD: 
-    
+      - image: php:7.2-apache
+      - image: circleci/mysql:5.7
+      
       # specify the version you desire here
       #- image: circleci/php:7.2.9-browsers
       
