@@ -28,11 +28,11 @@ jobs:
             - "/home/ubuntu/.composer/cache"
       - run:
           name: create test repot dir
-          command: mkdir -p $CIRCLE_TEST_REPORTS/phpunit
+          command: mkdir -p ~/phpunit
       - run:
           name: Wait for MySQL DB
           command: dockerize -wait tcp://localhost:3306 -timeout 1m
       - run:
           name: Initialize Database
           command: bin/cake migrations migrate
-      - run: vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit $CIRCLE_TEST_REPORTS/phpunit/junit.xml
+      - run: vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit ~/phpunit/junit.xml
