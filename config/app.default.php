@@ -299,7 +299,7 @@ return [
             'host' => 'localhost',
             //'port' => 'non_standard_port_number',
             'username' => 'root',
-            'password' => '',
+            'password' => 'password',
             'database' => 'circle_test ',
             //'encoding' => 'utf8mb4',
             'timezone' => 'UTC',
