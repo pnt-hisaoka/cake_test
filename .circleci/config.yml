@@ -40,3 +40,5 @@ jobs:
       #     name: Initialize Database
       #     command: bin/cake migrations migrate
       - run: vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit ~/phpunit/junit.xml
+      
+      
