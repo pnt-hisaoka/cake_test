@@ -296,7 +296,7 @@ return [
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,
-            'host' => 'localhost',
+            'host' => '127.0.0.1',
             //'port' => 'non_standard_port_number',
             'username' => 'root',
             'password' => 'password',
@@ -308,6 +308,7 @@ return [
             'log' => false,
             //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
             'url' => env('DATABASE_TEST_URL', null),
+            'unix_socket' => '/var/run/mysqld/mysqld.sock'
         ],
     ],
 
