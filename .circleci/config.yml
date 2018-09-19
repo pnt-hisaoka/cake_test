@@ -6,38 +6,48 @@ version: 2
 jobs:
   build:
     docker:
-      - image: tenkoma/php:7.1-apache-sample
+      # specify the version you desire here
+      - image: circleci/php:7.2-apache-stretch-node-browsers
         environment:
-        DEBUG: true
-        DATABASE_URL: "mysql://ubuntu:@127.0.0.1/cisample?unix_socket=/var/run/mysqld/mysqld.sock&encoding=utf8mb4&timezone=UTC&cacheMetadata=true"
-        DATABASE_TEST_URL: "mysql://ubuntu:@127.0.0.1/cisample_test?unix_socket=/var/run/mysqld/mysqld.sock&encoding=utf8mb4&timezone=UTC&cacheMetadata=true"
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_HOST: 127.0.0.1
 
-      - image: circleci/mysql:5.6.39-ram
-        environment:
-        - MYSQL_ROOT_PASSWORD=password
-        - MYSQL_DATABASE=circle_test
-        - MYSQL_USER=circleci
-        - MYSQL_PASSWORD=password
-  
-    working_directory: ~/repo
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mysql:9.4
 
     steps:
-      - restore_cache:
-          key: cakephp3-circleci-example-{{ .Branch }}
       - checkout
-      - run: composer install --dev --no-interaction
-      - save_cache:
-          key: cakephp3-circleci-example-{{ .Branch }}
-          paths:
-            - "/home/ubuntu/.composer/cache"
       - run:
-          name: create test repot dir
-          command: mkdir -p ~/phpunit
+          name: Install things we need
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libzip-dev
+            sudo apt-get install -y zlib1g-dev libicu-dev g++
+            sudo apt-get install mysql-client
+            sudo apt-get -y install mysql-server
       - run:
-          name: Wait for MySQL DB
-          command: dockerize -wait tcp://127.0.0.1:3306 -timeout 1m
-      # - run:
-      #     name: Initialize Database
-      #     command: bin/cake migrations migrate
+          name: Install PHP exts
+          command: |
+            sudo docker-php-ext-install zip
+            sudo docker-php-ext-configure intl
+            sudo docker-php-ext-install intl
+            sudo docker-php-ext-install pdo_mysql
+      - run:
+          name: Fix MySQL socket config
+          command: |
+            sudo sh -c "echo 'pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock' > /usr/local/etc/php/conf.d/pdo.ini"
+      - run:
+          name: Start database server
+          command: |
+            sudo service mysql start
+            sleep 2
+            ps aux | grep mysql
+      - run:
+          name: Create non-admin user
+          command: |
+            sudo mysql -u root -e "CREATE user myuser IDENTIFIED BY 'password';"
+
       - run: vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit ~/phpunit/junit.xml
       
