@@ -55,7 +55,7 @@ jobs:
       - run:
           name: mysql GRANT
           command: |
-            sudo mysql -u root -e "GRANT ALL PRIVILEGES ON circle_test.* TO myuser@127.0.0.1 identified by 'password';"
+            sudo mysql -u root -e "GRANT ALL PRIVILEGES ON circle_test.* TO 'myuser'@'%' identified by 'password';"
 
       - run: composer install --dev --no-interaction
       - save_cache:
