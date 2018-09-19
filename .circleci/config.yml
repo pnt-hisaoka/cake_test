@@ -49,5 +49,14 @@ jobs:
           command: |
             sudo mysql -u root -e "CREATE user myuser IDENTIFIED BY 'password';"
 
+      - run: composer install --dev --no-interaction
+      - save_cache:
+          key: cakephp3-circleci-example-{{ .Branch }}
+          paths:
+            - "/home/ubuntu/.composer/cache"
+      - run:
+          name: create test repot dir
+          command: mkdir -p ~/phpunit
+
       - run: vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit ~/phpunit/junit.xml
       
