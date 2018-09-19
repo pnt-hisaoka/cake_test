@@ -255,7 +255,7 @@ return [
              * the following line and set the port accordingly
              */
             //'port' => 'non_standard_port_number',
-            'username' => 'root',
+            'username' => 'myuser',
             'password' => 'password',
             'database' => 'circle_test ',
             //'encoding' => 'utf8mb4',
@@ -299,7 +299,7 @@ return [
             'persistent' => false,
             'host' => '127.0.0.1',
             //'port' => 'non_standard_port_number',
-            'username' => 'root',
+            'username' => 'myuser',
             'password' => 'password',
             'database' => 'circle_test ',
             //'encoding' => 'utf8mb4',

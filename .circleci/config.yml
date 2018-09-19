@@ -48,6 +48,10 @@ jobs:
           name: Create non-admin user
           command: |
             sudo mysql -u root -e "CREATE user myuser IDENTIFIED BY 'password';"
+      - run:
+          name: Create non-admin user
+          command: |
+            sudo mysql -u root -e "CREATE Database circle_test;"
 
       - run: composer install --dev --no-interaction
       - save_cache:
