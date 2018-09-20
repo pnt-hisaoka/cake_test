@@ -20,6 +20,8 @@ jobs:
     steps:
       - restore_cache:
           key: cakephp3-circleci-example-{{ .Branch }}
+          paths:
+            - "~/cache"
           
       - run:
           name: Install things we need
