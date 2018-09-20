@@ -28,21 +28,33 @@ jobs:
           name: Install mysql
           command: |
             sudo apt-get update
-            if $(sudo dpkg -l mysql-client* | grep 'no packages' > /dev/null) ; then
+            if $(sudo dpkg -l | grep 'mysql-client' > /dev/null) ; then
+              echo 'installed mysql-client'
+            else
               sudo apt-get install mysql-client
             fi
-              sudo apt-get -y install mysql-server
+            if $(sudo dpkg -l | grep 'mysql-server' > /dev/null) ; then
+              echo 'installed mysql-server'
+            else
+              sudo apt-get install mysql-server
+            fi
       - run:
           name: Install PHP exts
           command: |
             if $(php -m | grep 'zip' > /dev/null) ; then
+              echo 'installed zip'
+            else
               sudo docker-php-ext-install zip
             fi
             if $(php -m | grep 'intl' > /dev/null) ; then
+              echo 'installed intl'
+            else
               sudo docker-php-ext-configure intl
               sudo docker-php-ext-install intl
             fi
             if $(php -m | grep 'pdo_mysql' > /dev/null) ; then
+              echo 'installed pdo_mysql'
+            else
               sudo docker-php-ext-install pdo_mysql
             fi
   
