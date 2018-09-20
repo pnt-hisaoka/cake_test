@@ -20,9 +20,10 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: gem-cache-v1-{{ checksum "~/project/composer.json" }}-{{ checksum "~/project/config/app.php" }}
-          key: gem-cache-v1-{{ checksum "~/project/composer.json" }}
-          key: gem-cache-v1
+          keys:
+            - gem-cache-v1-{{ checksum "~/project/composer.json" }}-{{ checksum "~/project/config/app.php" }}
+            - gem-cache-v1-{{ checksum "~/project/composer.json" }}
+            - gem-cache-v1
 
       - run:
           name: Install mysql
