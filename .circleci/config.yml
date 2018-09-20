@@ -46,7 +46,7 @@ jobs:
             fi
             if $(php -m | grep 'pdo_mysql' > /dev/null) ; then
               sudo docker-php-ext-install pdo_mysql
-          fi
+            fi
   
       - save_cache:
           key: gem-cache-v1
