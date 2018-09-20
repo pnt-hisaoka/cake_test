@@ -20,26 +20,34 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: gem-cache-v1-{{ checksum "~/composer.json" }}-{{ checksum "~/config/app.php" }}
-          key: gem-cache-v1-{{ checksum "~/composer.json" }}
+          key: gem-cache-v1-{{ checksum "~/project/composer.json" }}-{{ checksum "~/project/config/app.php" }}
+          key: gem-cache-v1-{{ checksum "~/project/composer.json" }}
           key: gem-cache-v1
 
       - run:
           name: Install mysql
           command: |
+            sudo apt-get update
             if $(sudo dpkg -l mysql-client* | grep 'no packages' > /dev/null) ; then
-              sudo apt-get update
               sudo apt-get install mysql-client
+            fi
+            if $(sudo dpkg -l mysql-server* | grep 'no packages' > /dev/null) ; then
               sudo apt-get -y install mysql-server
             fi
       - run:
           name: Install PHP exts
           command: |
-            sudo docker-php-ext-install zip
-            sudo docker-php-ext-configure intl
-            sudo docker-php-ext-install intl
-            sudo docker-php-ext-install pdo_mysql
-
+            if $(php -m | grep 'zip' > /dev/null) ; then
+              sudo docker-php-ext-install zip
+            fi
+            if $(php -m | grep 'intl' > /dev/null) ; then
+              sudo docker-php-ext-configure intl
+              sudo docker-php-ext-install intl
+            fi
+            if $(php -m | grep 'pdo_mysql' > /dev/null) ; then
+              sudo docker-php-ext-install pdo_mysql
+          fi
+  
       - save_cache:
           key: gem-cache-v1
           paths:
@@ -48,7 +56,7 @@ jobs:
       - run: composer install --dev --no-interaction
 
       - save_cache:
-          key: gem-cache-v1-{{ checksum "~/composer.json" }}
+          key: gem-cache-v1-{{ checksum "~/project/composer.json" }}
           paths:
             - "~/cache"
 
@@ -71,7 +79,7 @@ jobs:
             sudo mysql -u root -e "GRANT ALL PRIVILEGES ON circle_test.* TO 'myuser'@'%' identified by 'password';"
 
       - save_cache:
-          key: gem-cache-v1-{{ checksum "~/composer.json" }}-{{ checksum "~/config/app.php" }}
+          key: gem-cache-v1-{{ checksum "~/project/composer.json" }}-{{ checksum "~/project/config/app.php" }}
           paths:
             - "~/cache"
 
