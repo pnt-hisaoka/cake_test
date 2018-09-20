@@ -31,9 +31,7 @@ jobs:
             if $(sudo dpkg -l mysql-client* | grep 'no packages' > /dev/null) ; then
               sudo apt-get install mysql-client
             fi
-            if $(sudo dpkg -l mysql-server* | grep 'no packages' > /dev/null) ; then
               sudo apt-get -y install mysql-server
-            fi
       - run:
           name: Install PHP exts
           command: |
