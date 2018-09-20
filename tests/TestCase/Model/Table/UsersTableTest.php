@@ -58,7 +58,7 @@ class UsersTableTest extends TestCase
      */
     public function testInitialize()
     {   
-        $this->assertEquals(2, 2);
+        $this->assertEquals(1, 1);
         $this->markTestIncomplete('Not implemented yet.');
     }
 
