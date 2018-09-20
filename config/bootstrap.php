@@ -199,4 +199,3 @@ Type::build('timestamp')
 //Inflector::rules('transliteration', ['/å/' => 'aa']);
 
 
-print_r(ConnectionManager::getConfig('default', ['url' => $dsn]));
