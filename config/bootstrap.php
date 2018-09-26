@@ -50,11 +50,11 @@ use Cake\Utility\Security;
  * variables as required.
  */
 if (!env('APP_NAME') && file_exists(CONFIG . '.env')) {
-    $dotenv = new \josegonzalez\Dotenv\Loader([CONFIG . '.env']);
-    $dotenv->parse()
-        ->putenv()
-        ->toEnv()
-        ->toServer();
+    // $dotenv = new \josegonzalez\Dotenv\Loader([CONFIG . '.env']);
+    // $dotenv->parse()
+    //     ->putenv()
+    //     ->toEnv()
+    //     ->toServer();
 }
 
 /*
@@ -197,3 +197,5 @@ Type::build('timestamp')
 //Inflector::rules('irregular', ['red' => 'redlings']);
 //Inflector::rules('uninflected', ['dontinflectme']);
 //Inflector::rules('transliteration', ['/å/' => 'aa']);
+
+

@@ -6,37 +6,97 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/php:7.2-apache-node-browsers
+      # specify the version you desire here
+      - image: circleci/php:7.2-apache-stretch-node-browsers
         environment:
-        DEBUG: true
-        DATABASE_URL: "mysql://ubuntu:@localhost/cisample?unix_socket=/var/run/mysqld/mysqld.sock&encoding=utf8mb4&timezone=UTC&cacheMetadata=true"
-        DATABASE_TEST_URL: "mysql://ubuntu:@localhost/cisample_test?unix_socket=/var/run/mysqld/mysqld.sock&encoding=utf8mb4&timezone=UTC&cacheMetadata=true"
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_HOST: 127.0.0.1
 
-      - image: circleci/mysql:5.6.39-ram
-        environment:
-        - MYSQL_ROOT_PASSWORD=password
-        - MYSQL_DATABASE=circle_test
-        - MYSQL_USER=circleci
-        - MYSQL_PASSWORD=password
-  
-    working_directory: ~/repo
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mysql:9.4
 
     steps:
-      - restore_cache:
-          key: cakephp3-circleci-example-{{ .Branch }}
       - checkout
-      - run: composer install --dev --no-interaction
+      - restore_cache:
+          keys:
+            - gem-cache-v1-{{ checksum "~/project/composer.json" }}-{{ checksum "~/project/config/app.default.php" }}
+            - gem-cache-v1-{{ checksum "~/project/composer.json" }}
+            - gem-cache-v1
+
+      - run:
+          name: Install mysql
+          command: |
+            sudo apt-get update
+            if $(sudo dpkg -l | grep 'mysql-client' > /dev/null) ; then
+              echo 'installed mysql-client'
+            else
+              sudo apt-get install mysql-client
+            fi
+            if $(sudo dpkg -l | grep 'mysql-server' > /dev/null) ; then
+              echo 'installed mysql-server'
+            else
+              sudo apt-get install mysql-server
+            fi
+      - run:
+          name: Install PHP exts
+          command: |
+            if $(php -m | grep 'zip' > /dev/null) ; then
+              echo 'installed zip'
+            else
+              sudo docker-php-ext-install zip
+            fi
+            if $(php -m | grep 'intl' > /dev/null) ; then
+              echo 'installed intl'
+            else
+              sudo docker-php-ext-configure intl
+              sudo docker-php-ext-install intl
+            fi
+            if $(php -m | grep 'pdo_mysql' > /dev/null) ; then
+              echo 'installed pdo_mysql'
+            else
+              sudo docker-php-ext-install pdo_mysql
+            fi
+  
       - save_cache:
-          key: cakephp3-circleci-example-{{ .Branch }}
+          key: gem-cache-v1
           paths:
-            - "/home/ubuntu/.composer/cache"
+            - "~/cache"
+
+      - run: composer install --dev --no-interaction
+
+      - save_cache:
+          key: gem-cache-v1-{{ checksum "~/project/composer.json" }}
+          paths:
+            - "~/cache"
+
+      - run:
+          name: Fix MySQL socket config
+          command: |
+            sudo sh -c "echo 'pdo_mysql.default_socket=/var/run/mysqld/mysqld.sock' > /usr/local/etc/php/conf.d/pdo.ini"
+      - run:
+          name: Start database server
+          command: |
+            sudo service mysql start
+            sleep 2
+            dockerize -wait tcp://localhost:3306 -timeout 1m
+            ps aux | grep mysql
+      - run:
+          name: Create non-admin user and test database
+          command: |
+            sudo mysql -u root -e "CREATE user myuser IDENTIFIED BY 'password';"
+            sudo mysql -u root -e "CREATE Database circle_test;"
+            sudo mysql -u root -e "GRANT ALL PRIVILEGES ON circle_test.* TO 'myuser'@'%' identified by 'password';"
+
+      - save_cache:
+          key: gem-cache-v1-{{ checksum "~/project/composer.json" }}-{{ checksum "~/project/config/app.default.php" }}
+          paths:
+            - "~/cache"
+
       - run:
           name: create test repot dir
           command: mkdir -p ~/phpunit
-      - run:
-          name: Wait for MySQL DB
-          command: dockerize -wait tcp://localhost:3306 -timeout 1m
-      # - run:
-      #     name: Initialize Database
-      #     command: bin/cake migrations migrate
+
       - run: vendor/bin/phpunit --configuration phpunit.xml.dist --log-junit ~/phpunit/junit.xml
+      
